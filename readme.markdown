@@ -1,3 +1,3 @@
 //READ ME
 
-Source for my Wordpress theming site.
+My coldfusion Bloging software. Getting a lot of inspiration from Wordpress.
