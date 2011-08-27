@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model/adapters
+END
+Oracle.cfc
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model/adapters/Oracle.cfc
+END
+Base.cfc
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model/adapters/Base.cfc
+END
+MySQL.cfc
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model/adapters/MySQL.cfc
+END
+MicrosoftSQLServer.cfc
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model/adapters/MicrosoftSQLServer.cfc
+END
+PostgreSQL.cfc
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model/adapters/PostgreSQL.cfc
+END
+H2.cfc
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model/adapters/H2.cfc
+END

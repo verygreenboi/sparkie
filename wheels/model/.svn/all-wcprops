@@ -1,0 +1,95 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model
+END
+onmissingmethod.cfm
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model/onmissingmethod.cfm
+END
+calculations.cfm
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model/calculations.cfm
+END
+nestedproperties.cfm
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model/nestedproperties.cfm
+END
+errors.cfm
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model/errors.cfm
+END
+callbacks.cfm
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model/callbacks.cfm
+END
+miscellaneous.cfm
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model/miscellaneous.cfm
+END
+sql.cfm
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model/sql.cfm
+END
+associations.cfm
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model/associations.cfm
+END
+properties.cfm
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model/properties.cfm
+END
+transactions.cfm
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model/transactions.cfm
+END
+validations.cfm
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model/validations.cfm
+END
+functions.cfm
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model/functions.cfm
+END
+crud.cfm
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model/crud.cfm
+END
+initialization.cfm
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model/initialization.cfm
+END
+serialize.cfm
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/aidsproject/!svn/ver/4/aidsproject/cfwheels/wheels/model/serialize.cfm
+END
