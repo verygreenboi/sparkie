@@ -1,8 +1,25 @@
+<cffunction name="$htmlFormat" returntype="string" access="public" output="false">
+	<cfargument name="string" type="string" required="true" />
+	<cfscript>
+		var loc = {};
+		if (!StructKeyExists(application.wheels.vendor, "stringEscapeUtils"))
+		{
+			loc.filePaths = [];
+			loc.filePaths[1] = ExpandPath("wheels/vendor/commons-lang/commons-lang-2.5.jar");
+			loc.javaLoader = CreateObject("component", "#application.wheels.wheelsComponentPath#.vendor.javaloader.JavaLoader").init(loc.filePaths);
+			application.wheels.vendor.stringEscapeUtils = loc.javaLoader.create("org.apache.commons.lang.StringEscapeUtils");
+		}
+	</cfscript>
+	<cfreturn application.wheels.vendor.stringEscapeUtils.escapeHtml(arguments.string) />
+</cffunction>
+
 <cffunction name="$initializeRequestScope" returntype="void" access="public" output="false">
 	<cfscript>
 		if (!StructKeyExists(request, "wheels"))
 		{
 			request.wheels = {};
+			request.wheels.vendor = {};
+			request.wheels.routes = {};
 			request.wheels.params = {};
 			request.wheels.cache = {};
 			
@@ -22,19 +39,72 @@
 	<cfargument name="data" type="any" required="true">
 	<cfscript>
 		// only instantiate the toXml object once per request
-		if (!StructKeyExists(request.wheels, "toXml"))
-			request.wheels.toXml = $createObjectFromRoot(path="#application.wheels.wheelsComponentPath#.vendor.toXml", fileName="toXML", method="init");
+		if (!StructKeyExists(request.wheels.vendor, "toXml"))
+			request.wheels.vendor.toXml = $createObjectFromRoot(path="#application.wheels.wheelsComponentPath#.vendor.toXml", fileName="toXML", method="init");
 	</cfscript>
-	<cfreturn request.wheels.toXml.toXml(arguments.data) />
+	<cfreturn request.wheels.vendor.toXml.toXml(arguments.data) />
 </cffunction>
 
 <cffunction name="$convertToString" returntype="string" access="public" output="false">
 	<cfargument name="value" type="Any" required="true">
+	<cfargument name="type" type="string" required="false" default="">
 	<cfscript>
-		if (IsBinary(arguments.value))
-			return ToString(arguments.value);
-		else if (IsDate(arguments.value))
-			return CreateDateTime(year(arguments.value), month(arguments.value), day(arguments.value), hour(arguments.value), minute(arguments.value), second(arguments.value));
+		var loc = {};
+		
+		if (!len(arguments.type))
+		{
+			if (IsArray(arguments.value))
+			{
+				arguments.type = "array";
+			}
+			else if (IsStruct(arguments.value))
+			{
+				arguments.type = "struct";
+			}
+			else if (IsBinary(arguments.value))
+			{
+				arguments.type = "binary";
+			}
+			else if (IsNumeric(arguments.value))
+			{
+				arguments.type = "integer";
+			}
+			else if (IsDate(arguments.value))
+			{
+				arguments.type = "datetime";
+			}
+		}
+		
+		switch (arguments.type)
+		{
+			case "array":
+				arguments.value = ArrayToList(arguments.value);
+				break;
+			case "struct":
+				loc.str = "";
+				loc.keyList = ListSort(StructKeyList(arguments.value), "textnocase", "asc");
+				loc.iEnd = ListLen(loc.keyList);
+				for (loc.i = 1; loc.i <= loc.iEnd; loc.i++)
+				{
+					loc.key = ListGetAt(loc.keyList, loc.i);
+					loc.str = ListAppend(loc.str, loc.key & "=" & arguments.value[loc.key]);
+				}
+				arguments.value = loc.str;
+				break;
+			case "binary":
+				arguments.value = ToString(arguments.value);
+				break;
+			case "float": case "integer": case "boolean":
+				arguments.value = Val(arguments.value);
+				break;
+			case "datetime":
+				// createdatetime will throw an error
+				if(IsDate(arguments.value))
+				{
+					arguments.value = CreateDateTime(year(arguments.value), month(arguments.value), day(arguments.value), hour(arguments.value), minute(arguments.value), second(arguments.value));
+				}
+				break;
+		}
 	</cfscript>
 	<cfreturn arguments.value>
 </cffunction>
@@ -43,15 +113,52 @@
 	<cfargument name="list" type="string" required="true">
 	<cfargument name="delim" type="string" required="false" default=",">
 	<cfargument name="returnAs" type="string" required="false" default="string">
+	<cfargument name="defaultValue" type="any" required="false" default="">
 	<cfscript>
 		var loc = {};
 		loc.list = ListToArray(arguments.list, arguments.delim);
-		for (loc.i = 1; loc.i lte ArrayLen(loc.list); loc.i++)
+		loc.iEnd = ArrayLen(loc.list);
+		for (loc.i = 1; loc.i lte loc.iEnd; loc.i++)
+		{
 			loc.list[loc.i] = Trim(loc.list[loc.i]);
-		if (arguments.returnAs == "array")
-			return loc.list;
+		}
+
+		switch (arguments.returnAs)
+		{
+			case "array":
+			{// already an array so just break out
+				break;
+			}
+			case "struct":
+			{
+				loc.s = {};
+				for (loc.i = 1; loc.i lte loc.iEnd; loc.i++)
+				{
+					loc.s[loc.list[loc.i]] = arguments.defaultValue;
+				}
+				loc.list = loc.s;
+				break;
+			}
+			default:
+			{// create a list using the supplied delimeter
+				loc.list = ArrayToList(loc.list, arguments.delim);
+				break;
+			}
+		}
 	</cfscript>
-	<cfreturn ArrayToList(loc.list, arguments.delim)>
+	<cfreturn loc.list>
+</cffunction>
+
+<cffunction name="$simpleHashedKey" returntype="string" access="public" output="false" hint="Same as $hashedKey but cannot handle binary data in queries.">
+	<cfargument name="value" type="any" required="true">
+	<cfscript>
+		var returnValue = "";
+		returnValue = SerializeJSON(arguments.value);
+		// remove the characters that indicate array or struct so that we can sort it as a list below
+		returnValue = ReplaceList(returnValue, "{,},[,]", ",,,");
+		returnValue = ListSort(returnValue, "text");
+		return returnValue;
+	</cfscript>
 </cffunction>
 
 <cffunction name="$hashedKey" returntype="string" access="public" output="false" hint="Creates a unique string based on any arguments passed in (used as a key for caching mostly).">
@@ -71,10 +178,7 @@
 			// this might fail if a query contains binary data so in those rare cases we fall back on using cfwddx (which is a little bit slower which is why we don't use it all the time)
 			try
 			{
-				loc.returnValue = SerializeJSON(loc.values);
-				// remove the characters that indicate array or struct so that we can sort it as a list below
-				loc.returnValue = ReplaceList(loc.returnValue, "{,},[,]", ",,,");
-				loc.returnValue = ListSort(loc.returnValue, "text");
+				loc.returnValue = $simpleHashedKey(loc.values);
 			}
 			catch (Any e)
 			{
@@ -87,8 +191,9 @@
 
 <cffunction name="$timeSpanForCache" returntype="any" access="public" output="false">
 	<cfargument name="cache" type="any" required="true">
-	<cfargument name="defaultCacheTime" type="numeric" required="false" default="#application.wheels.defaultCacheTime#">
-	<cfargument name="cacheDatePart" type="string" required="false" default="#application.wheels.cacheDatePart#">
+	<cfargument name="category" type="string" required="true">
+	<cfargument name="defaultCacheTime" type="numeric" required="false" default="#application.wheels.cacheSettings[arguments.category].defaultCacheTime#">
+	<cfargument name="cacheDatePart" type="string" required="false" default="#application.wheels.cacheSettings[arguments.category].cacheDatePart#">
 	<cfscript>
 		var loc = {};
 		loc.cache = arguments.defaultCacheTime;
@@ -239,28 +344,52 @@
 			$throw(type="Wheels.RouteNotFound", message="Could not find the `#arguments.route#` route.", extendedInfo="Create a new route in `config/routes.cfm` with the name `#arguments.route#`.");
 
 		loc.routePos = application.wheels.namedRoutePositions[arguments.route];
-		if (loc.routePos Contains ",")
+		
+		if (ArrayLen(loc.routePos) gt 1)
 		{
-			// there are several routes with this name so we need to figure out which one to use by checking the passed in arguments
-			loc.iEnd = ListLen(loc.routePos);
-			for (loc.i=1; loc.i <= loc.iEnd; loc.i++)
+			// get our routes - we cache them in the request.wheels.routes scope to save time on subsequent calls to $findRoute
+			if (StructKeyExists(request.wheels.routes, arguments.route))
 			{
-				loc.returnValue = application.wheels.routes[ListGetAt(loc.routePos, loc.i)];
+				loc.routeArray = request.wheels.routes[arguments.route];
+			}
+			else
+			{
+				loc.routeArray = [];
+				for (loc.i = 1; loc.i lte ArrayLen(loc.routePos); loc.i++)
+					loc.routeArray[loc.i] = application.wheels.routes[loc.routePos[loc.i]];
+				request.wheels.routes[arguments.route] = loc.routeArray;
+			}
+			
+			loc.foundRoute = false;
+			while (!loc.foundRoute) // need to use a while loop here so we don't loop through all of the routes
+			{
+				if (application.wheels.showErrorInformation && !ArrayLen(loc.routeArray))
+					$throw(type="Wheels.RouteMatchNotFound", message="Could not find a match for the `#arguments.route#` route.");
+
+				// we always try to find the route on the first position because we are cleaning the array everytime we don't find a match
+				loc.returnValue = loc.routeArray[1];
 				loc.foundRoute = true;
-				loc.jEnd = ListLen(loc.returnValue.variables);
-				for (loc.j=1; loc.j <= loc.jEnd; loc.j++)
+				
+				for (loc.i = 1; loc.i lte ListLen(loc.returnValue.variables); loc.i++)
 				{
-					loc.variable = ListGetAt(loc.returnValue.variables, loc.j);
+					loc.variable = ListGetAt(loc.returnValue.variables, loc.i);
 					if (!StructKeyExists(arguments, loc.variable) || !Len(arguments[loc.variable]))
+					{
 						loc.foundRoute = false;
+						break;
+					}
 				}
-				if (loc.foundRoute)
-					break;
+				
+				// clean the array of all routes that contain the variable that failed
+				if (!loc.foundRoute)
+					for (loc.i = ArrayLen(loc.routeArray); loc.i gte 1; loc.i--)
+						if (ListFindNoCase(loc.routeArray[loc.i].variables, loc.variable))
+							ArrayDeleteAt(loc.routeArray, loc.i);
 			}
 		}
 		else
 		{
-			loc.returnValue = application.wheels.routes[loc.routePos];
+			loc.returnValue = application.wheels.routes[loc.routePos[1]];
 		}
 	</cfscript>
 	<cfreturn loc.returnValue>
@@ -306,14 +435,34 @@
 	<cfreturn loc.returnValue>
 </cffunction>
 
-<cffunction name="$args" returntype="void" access="public" output="false">
+<cffunction name="$args" returntype="any" access="public" output="false">
 	<cfargument name="args" type="struct" required="true">
 	<cfargument name="name" type="string" required="true">
 	<cfargument name="reserved" type="string" required="false" default="">
 	<cfargument name="combine" type="string" required="false" default="">
+	<cfargument name="cachable" type="boolean" required="false" default="false">
 	<cfargument name="required" type="string" required="false" default="">
 	<cfscript>
 		var loc = {};
+		
+		// if function result caching is enabled globally, the calling function is cachable and we're not coming from a recursive call we return the result from the cache (setting the cache first when necessary)
+		if (application.wheels.cacheFunctions && arguments.cachable && !StructKeyExists(arguments.args, "$recursive"))
+		{
+			// create a unique key based on the arguments passed in to the calling function
+			// we use the simple version of the $hashedKey function here for performance reasons (we know that we'll never have binary query data passed in anyway so we don't need to deal with that)
+			loc.functionHash = $simpleHashedKey(arguments.args);
+			
+			// if the function result is not already in the cache we'll call the function and place the result in the cache
+			loc.functionResult = $getFromCache(key=loc.functionHash, category="functions");
+			if (IsBoolean(loc.functionResult) && !loc.functionResult)
+			{
+				arguments.args.$recursive = true;
+				loc.functionResult = $invoke(method=arguments.name, invokeArgs=arguments.args);
+				$addToCache(key=loc.functionHash, value=loc.functionResult, category="functions");
+			}
+			return loc.functionResult;
+		}
+		
 		if (Len(arguments.combine))
 		{
 			loc.iEnd = ListLen(arguments.combine);
@@ -360,22 +509,6 @@
 			}
 		}
 	</cfscript>
-</cffunction>
-
-<cffunction name="$createObjectFromRoot" returntype="any" access="public" output="false">
-	<cfargument name="path" type="string" required="true">
-	<cfargument name="fileName" type="string" required="true">
-	<cfargument name="method" type="string" required="true">
-	<cfscript>
-		var returnValue = "";
-		arguments.returnVariable = "returnValue";
-		arguments.component = ListChangeDelims(arguments.path, ".", "/") & "." & ListChangeDelims(arguments.fileName, ".", "/");
-		arguments.argumentCollection = Duplicate(arguments);
-		StructDelete(arguments, "path");
-		StructDelete(arguments, "fileName");
-	</cfscript>
-	<cfinclude template="../../root.cfm">
-	<cfreturn returnValue>
 </cffunction>
 
 <cffunction name="$debugPoint" returntype="void" access="public" output="false">
@@ -493,112 +626,75 @@
 </cffunction>
 
 <cffunction name="$addToCache" returntype="void" access="public" output="false">
-	<cfargument name="key" type="string" required="true">
-	<cfargument name="value" type="any" required="true">
-	<cfargument name="time" type="numeric" required="false" default="#application.wheels.defaultCacheTime#">
-	<cfargument name="category" type="string" required="false" default="main">
-	<cfscript>
-		var loc = {};
-		if (application.wheels.cacheCullPercentage > 0 && application.wheels.cacheLastCulledAt < DateAdd("n", -application.wheels.cacheCullInterval, Now()) && $cacheCount() >= application.wheels.maximumItemsToCache)
-		{
-			// cache is full so flush out expired items from this cache to make more room if possible
-			loc.deletedItems = 0;
-			loc.cacheCount = $cacheCount();
-			for (loc.key in application.wheels.cache[arguments.category])
-			{
-				if (Now() > application.wheels.cache[arguments.category][loc.key].expiresAt)
-				{
-					$removeFromCache(key=loc.key, category=arguments.category);
-					if (application.wheels.cacheCullPercentage < 100)
-					{
-						loc.deletedItems++;
-						loc.percentageDeleted = (loc.deletedItems / loc.cacheCount) * 100;
-						if (loc.percentageDeleted >= application.wheels.cacheCullPercentage)
-							break;
-					}
-				}
-			}
-			application.wheels.cacheLastCulledAt = Now();
-		}
-		if ($cacheCount() < application.wheels.maximumItemsToCache)
-		{
-			application.wheels.cache[arguments.category][arguments.key] = {};
-			application.wheels.cache[arguments.category][arguments.key].expiresAt = DateAdd(application.wheels.cacheDatePart, arguments.time, Now());
-			if (IsSimpleValue(arguments.value))
-				application.wheels.cache[arguments.category][arguments.key].value = arguments.value;
-			else
-				application.wheels.cache[arguments.category][arguments.key].value = duplicate(arguments.value);
-		}
-	</cfscript>
+	<cfargument name="category" type="string" required="false" default="main" />
+	<cfset application.wheels.caches[arguments.category].add(argumentCollection=arguments)>
 </cffunction>
 
 <cffunction name="$getFromCache" returntype="any" access="public" output="false">
-	<cfargument name="key" type="string" required="true">
-	<cfargument name="category" type="string" required="false" default="main">
+	<cfargument name="category" type="string" required="false" default="main" />
 	<cfscript>
-		var loc = {};
-		loc.returnValue = false;
-		if (StructKeyExists(application.wheels.cache[arguments.category], arguments.key))
+		var cacheItem = application.wheels.caches[arguments.category].get(argumentCollection=arguments);
+		
+		if (application.wheels.showDebugInformation)
 		{
-			if (Now() > application.wheels.cache[arguments.category][arguments.key].expiresAt)
+			if (IsSimpleValue(cacheItem) && IsBoolean(cacheItem) && !cacheItem)
 			{
-				if (application.wheels.showDebugInformation)
-					request.wheels.cacheCounts.culls = request.wheels.cacheCounts.culls + 1;
-				$removeFromCache(key=arguments.key, category=arguments.category);
+				request.wheels.cacheCounts.misses = request.wheels.cacheCounts.misses + 1;
 			}
 			else
 			{
-				if (application.wheels.showDebugInformation)
-					request.wheels.cacheCounts.hits = request.wheels.cacheCounts.hits + 1;
-				if (IsSimpleValue(application.wheels.cache[arguments.category][arguments.key].value))
-					loc.returnValue = application.wheels.cache[arguments.category][arguments.key].value;
-				else
-					loc.returnValue = Duplicate(application.wheels.cache[arguments.category][arguments.key].value);
+				request.wheels.cacheCounts.hits = request.wheels.cacheCounts.hits + 1;
 			}
 		}
-
-		if (application.wheels.showDebugInformation && IsBoolean(loc.returnValue) && !loc.returnValue)
-			request.wheels.cacheCounts.misses = request.wheels.cacheCounts.misses + 1;
 	</cfscript>
-	<cfreturn loc.returnValue>
+	<cfreturn cacheItem>
 </cffunction>
 
 <cffunction name="$removeFromCache" returntype="void" access="public" output="false">
-	<cfargument name="key" type="string" required="true">
-	<cfargument name="category" type="string" required="false" default="main">
-	<cfset StructDelete(application.wheels.cache[arguments.category], arguments.key)>
+	<cfargument name="category" type="string" required="true" />
+	<cfset application.wheels.caches[arguments.category].remove(argumentCollection=arguments)>
 </cffunction>
 
 <cffunction name="$cacheCount" returntype="numeric" access="public" output="false">
-	<cfargument name="category" type="string" required="false" default="">
+	<cfargument name="category" type="string" required="false" default="" />
 	<cfscript>
 		var loc = {};
+		loc.count = 0;
+		
 		if (Len(arguments.category))
-		{
-			loc.returnValue = StructCount(application.wheels.cache[arguments.category]);
-		}
-		else
-		{
-			loc.returnValue = 0;
-			for (loc.key in application.wheels.cache)
-				loc.returnValue = loc.returnValue + StructCount(application.wheels.cache[loc.key]);
-		}
+			return application.wheels.caches[arguments.category].count();
+			
+		for (loc.item in application.wheels.caches)
+			loc.count = loc.count + application.wheels.caches[loc.item].count();
 	</cfscript>
-	<cfreturn loc.returnValue>
+	<cfreturn loc.count />
+</cffunction>
+
+<cffunction name="$cacheCapacity" returntype="numeric" access="public" output="false">
+	<cfargument name="category" type="string" required="false" default="" />
+	<cfscript>
+		var loc = {};
+		loc.capacity = 0;
+		
+		if (Len(arguments.category))
+			return application.wheels.caches[arguments.category].capacity();
+			
+		for (loc.item in application.wheels.caches)
+			loc.capacity = loc.capacity + application.wheels.caches[loc.item].capacity();
+	</cfscript>
+	<cfreturn loc.capacity />
 </cffunction>
 
 <cffunction name="$clearCache" returntype="void" access="public" output="false">
-	<cfargument name="category" type="string" required="false" default="">
+	<cfargument name="category" type="string" required="false" default="" />
 	<cfscript>
 		var loc = {};
+		
 		if (Len(arguments.category))
-		{
-			StructClear(application.wheels.cache[arguments.category]);
-		}
-		else
-		{
-			StructClear(application.wheels.cache);
-		}
+			return application.wheels.caches[arguments.category].clear();
+			
+		for (loc.item in application.wheels.caches)
+			loc.count = loc.count + application.wheels.caches[loc.item].clear();
 	</cfscript>
 </cffunction>
 
@@ -758,8 +854,8 @@ Should now call bar() instead and marking foo() as deprecated
 			if (StructKeyExists(loc.route, "name") && len(loc.route.name))
 			{
 				if (!StructKeyExists(application.wheels.namedRoutePositions, loc.route.name))
-					application.wheels.namedRoutePositions[loc.route.name] = "";
-				application.wheels.namedRoutePositions[loc.route.name] = ListAppend(application.wheels.namedRoutePositions[loc.route.name], loc.i);
+					application.wheels.namedRoutePositions[loc.route.name] = ArrayNew(1);
+				ArrayAppend(application.wheels.namedRoutePositions[loc.route.name], loc.i);
 			}
 		}
 		</cfscript>
@@ -773,169 +869,67 @@ Should now call bar() instead and marking foo() as deprecated
 	<cfset StructClear(application.wheels.controllers)>
 </cffunction>
 
-<cffunction name="$loadPlugins" returntype="void" access="public" output="false">
-	<cfscript>
-	var loc = {};
-	application.wheels.plugins = {};
-	application.wheels.incompatiblePlugins = "";
-	application.wheels.mixableComponents = "application,dispatch,controller,model,microsoftsqlserver,mysql,oracle,postgresql,h2";
-	application.wheels.mixins = {};
-	application.wheels.dependantPlugins = "";
-	loc.pluginFolder = GetDirectoryFromPath(GetBaseTemplatePath()) & "plugins";
-
-	// get a list of plugin files and folders
-	loc.pluginFolders = $directory(directory=loc.pluginFolder, type="dir");
-	loc.pluginFiles = $directory(directory=loc.pluginFolder, filter="*.zip", type="file", sort="name DESC");
-
-	// delete plugin directories if no corresponding plugin zip file exists
-	if (application.wheels.deletePluginDirectories)
-	{
-		loc.iEnd = loc.pluginFolders.recordCount;
-		for (loc.i=1; loc.i <= loc.iEnd; loc.i++)
-		{
-			loc.name = loc.pluginFolders["name"][loc.i];
-			loc.directory = loc.pluginFolders["directory"][loc.i];
-			if (Left(loc.name, 1) != "." && !ListContainsNoCase(ValueList(loc.pluginFiles.name), loc.name & "-"))
-			{
-				loc.directory = loc.directory & "/" & loc.name;
-				$directory(action="delete", directory=loc.directory, recurse=true);
-			}
-		}
-	}
-
-	// create directory and unzip code for the most recent version of each plugin
-	if (loc.pluginFiles.recordCount)
-	{
-		loc.iEnd = loc.pluginFiles.recordCount;
-		for (loc.i=1; loc.i <= loc.iEnd; loc.i++)
-		{
-			loc.name = loc.pluginFiles["name"][loc.i];
-			loc.pluginName = ListFirst(loc.name, "-");
-			if (!StructKeyExists(application.wheels.plugins, loc.pluginName))
-			{
-				loc.pluginVersion = Replace(ListLast(loc.name, "-"), ".zip", "", "one");
-				loc.thisPluginFile = loc.pluginFolder & "/" & loc.name;
-				loc.thisPluginFolder = loc.pluginFolder & "/" & LCase(loc.pluginName);
-				if (!DirectoryExists(loc.thisPluginFolder))
-					$directory(action="create", directory=loc.thisPluginFolder);
-
-				// unzip the plugin to its directory unless the developer has told us not to
-				// we don't use the overwrite attribute on cfzip since it's been reported that it updates the date on the files on railo
-				if (application.wheels.overwritePlugins)
-					$zip(action="unzip", destination=loc.thisPluginFolder, file=loc.thisPluginFile, overwrite=true);
-
-				loc.fileName = LCase(loc.pluginName) & "." & loc.pluginName;
-				loc.plugin = $createObjectFromRoot(path=application.wheels.pluginComponentPath, fileName=loc.fileName, method="init");
-				loc.plugin.pluginVersion = loc.pluginVersion;
-				if (!StructKeyExists(loc.plugin, "version") || ListFind(loc.plugin.version, SpanExcluding(application.wheels.version, " ")) || application.wheels.loadIncompatiblePlugins)
-				{
-					application.wheels.plugins[loc.pluginName] = loc.plugin;
-					if (StructKeyExists(loc.plugin, "version") && !ListFind(loc.plugin.version, SpanExcluding(application.wheels.version, " ")))
-						application.wheels.incompatiblePlugins = ListAppend(application.wheels.incompatiblePlugins, loc.pluginName);
-				}
-			}
-		}
-		// store plugin injection information in application scope so we don't have to run this code on each injection
-		loc.iEnd = ListLen(application.wheels.mixableComponents);
-		for (loc.i=1; loc.i <= loc.iEnd; loc.i++)
-		{
-			application.wheels.mixins[ListGetAt(application.wheels.mixableComponents, loc.i)] = {};
-		}
-		loc.iList = StructKeyList(application.wheels.plugins);
-		loc.iEnd = ListLen(loc.iList);
-		for (loc.i=1; loc.i <= loc.iEnd; loc.i++)
-		{
-			loc.iItem = ListGetAt(loc.iList, loc.i);
-			loc.pluginMeta = GetMetaData(application.wheels.plugins[loc.iItem]); // grab meta data of the plugin
-			if (!StructKeyExists(loc.pluginMeta, "environment") || ListFindNoCase(loc.pluginMeta.environment, application.wheels.environment))
-			{
-				loc.pluginMixins = "global"; // by default and for backwards compatibility, we inject all methods into all objects
-				if (StructKeyExists(loc.pluginMeta, "mixin"))
-					loc.pluginMixins = loc.pluginMeta["mixin"]; // if the component has a default mixin value, assign that value
-				// loop through all plugin methods and enter injection info accordingly (based on the mixin value on the method or the default one set on the entire component)
-				loc.jList = StructKeyList(application.wheels.plugins[loc.iItem]);
-				loc.jEnd = ListLen(loc.jList);
-				for (loc.j=1; loc.j <= loc.jEnd; loc.j++)
-				{
-					loc.jItem = ListGetAt(loc.jList, loc.j);
-					if (IsCustomFunction(application.wheels.plugins[loc.iItem][loc.jItem]) && loc.jItem != "init")
-					{
-						loc.methodMeta = GetMetaData(application.wheels.plugins[loc.iItem][loc.jItem]);
-						loc.methodMixins = loc.pluginMixins;
-						if (StructKeyExists(loc.methodMeta, "mixin"))
-							loc.methodMixins = loc.methodMeta["mixin"];
-						// mixin all methods except those marked as none
-						if (loc.methodMixins != "none")
-						{
-							loc.kEnd = ListLen(application.wheels.mixableComponents);
-							for (loc.k=1; loc.k <= loc.kEnd; loc.k++)
-							{
-								loc.kItem = ListGetAt(application.wheels.mixableComponents, loc.k);
-								if (loc.methodMixins == "global" || ListFindNoCase(loc.methodMixins, loc.kItem))
-									application.wheels.mixins[loc.kItem][loc.jItem] = application.wheels.plugins[loc.iItem][loc.jItem];
-							}
-						}
-					}
-				}
-			}
-		}
-		// look for plugins that are incompatible with each other
-		loc.addedFunctions = "";
-		for (loc.key in application.wheels.plugins)
-		{
-			for (loc.keyTwo in application.wheels.plugins[loc.key])
-			{
-				if (!ListFindNoCase("init,version,pluginVersion", loc.keyTwo))
-				{
-					if (ListFindNoCase(loc.addedFunctions, loc.keyTwo))
-						$throw(type="Wheels.IncompatiblePlugin", message="#loc.key# is incompatible with a previously installed plugin.", extendedInfo="Make sure none of the plugins you have installed override the same Wheels functions.");
-					else
-						loc.addedFunctions = ListAppend(loc.addedFunctions, loc.keyTwo);
-				}
-			}
-		}
-		// look for plugins that depend on other plugins that are not installed
-		for (loc.key in application.wheels.plugins)
-		{
-			loc.pluginInfo = GetMetaData(application.wheels.plugins[loc.key]);
-			if (StructKeyExists(loc.pluginInfo, "dependency"))
-			{
-				loc.iEnd = ListLen(loc.pluginInfo.dependency);
-				for (loc.i=1; loc.i <= loc.iEnd; loc.i++)
-				{
-					loc.iItem = ListGetAt(loc.pluginInfo.dependency, loc.i);
-					if (!StructKeyExists(application.wheels.plugins, loc.iItem))
-						application.wheels.dependantPlugins = ListAppend(application.wheels.dependantPlugins, Reverse(SpanExcluding(Reverse(loc.pluginInfo.name), ".")) & "|" & loc.iItem);
-				}
-			}
-		}
-	}
-	</cfscript>
-</cffunction>
-
 <cffunction name="$checkMinimumVersion" access="public" returntype="boolean" output="false">
+
 	<cfargument name="version" type="string" required="true">
 	<cfargument name="minversion" type="string" required="true">
 	<cfscript>
 	var loc = {};
 
-	// remove periods and commas from the version and minimum version
-	arguments.version = ListChangeDelims(arguments.version, "", ".,");
-	arguments.minversion = ListChangeDelims(arguments.minversion, "", ".,");
+	arguments.version = ListChangeDelims(arguments.version, ".", ".,");
+	arguments.minversion = ListChangeDelims(arguments.minversion, ".", ".,");
+
+	arguments.version = ListToArray(arguments.version, ".");
+	arguments.minversion = ListToArray(arguments.minversion, ".");
 
 	// make version and minversion the same length pad zeros to the end
-	loc.a = max(len(arguments.version), len(arguments.minversion));
+	loc.minSize = max(ArrayLen(arguments.version), ArrayLen(arguments.minversion));
 
-	arguments.version = arguments.version & RepeatString("0", loc.a - len(arguments.version));
-	arguments.minversion = arguments.minversion & RepeatString("0", loc.a - len(arguments.minversion));
+	ArrayResize(arguments.version, loc.minSize);
+	ArrayResize(arguments.minversion, loc.minSize);
 
-	// make sure the version is an integer
-	if (IsNumeric(arguments.version) && IsNumeric(arguments.minversion) && arguments.version >= arguments.minversion)
+	for(loc.i=1; loc.i LTE loc.minSize; loc.i++)
 	{
-		return true;
+		loc.version = 0;
+		if(ArrayIsDefined(arguments.version, loc.i))
+		{
+			loc.version = val(arguments.version[loc.i]);
+		}
+		
+		loc.minversion = 0;
+		if(ArrayIsDefined(arguments.minversion, loc.i))
+		{
+			loc.minversion = val(arguments.minversion[loc.i]);
+		}
+		
+		if(loc.version gt loc.minversion)
+		{
+			return true;
+		}
+		
+		if(loc.version lt loc.minversion)
+		{
+			return false;
+		}
 	}
 
-	return false;
+	return true;
 	</cfscript>
 	<cfreturn >
+</cffunction>
+
+<cffunction name="$loadPlugins" returntype="void" access="public" output="false">
+	<cfscript>
+	application.wheels.PluginObj = $createObjectFromRoot(
+		path="wheels"
+		,fileName="Plugins"
+		,method="init"
+		,pluginPath="#application.wheels.webPath & application.wheels.pluginPath#"
+	);
+	
+	application.wheels.plugins = application.wheels.PluginObj.getPlugins();
+	application.wheels.incompatiblePlugins = application.wheels.PluginObj.getIncompatiblePlugins();
+	application.wheels.dependantPlugins = application.wheels.PluginObj.getDependantPlugins();
+	application.wheels.mixins = application.wheels.PluginObj.getMixins();
+	</cfscript>
 </cffunction>

@@ -52,7 +52,7 @@
 		
 		if (application.wheels.cachePages && (IsNumeric(arguments.$cache) || (IsBoolean(arguments.$cache) && arguments.$cache)))
 		{
-			loc.category = "action";
+			loc.category = "pages";
 			loc.key = $hashedKey(arguments, variables.params);
 			loc.lockName = loc.category & loc.key;
 			loc.conditionArgs = {};
@@ -208,9 +208,13 @@
 	categories="controller-request,rendering" chapters="" functions="setResponse">
 	<cfscript>
 		if ($performedRender())
+		{
 			return Trim(variables.$instance.response);
+		}
 		else
+		{
 			return "";
+		}
 	</cfscript>
 </cffunction>
 
@@ -240,7 +244,7 @@
 		var returnValue = "";
 		returnValue = $renderPage(argumentCollection=arguments);
 		if (!IsNumeric(arguments.$cache))
-			arguments.$cache = application.wheels.defaultCacheTime;
+			arguments.$cache = application.wheels.cacheSettings[arguments.category].defaultCacheTime;
 		$addToCache(key=arguments.key, value=returnValue, time=arguments.$cache, category=arguments.category);
 	</cfscript>
 	<cfreturn returnValue>
@@ -265,7 +269,7 @@
 		var returnValue = "";
 		returnValue = $renderPartial(argumentCollection=arguments);
 		if (!IsNumeric(arguments.$cache))
-			arguments.$cache = application.wheels.defaultCacheTime;
+			arguments.$cache = application.wheels.cacheSettings[arguments.category].defaultCacheTime;
 		$addToCache(key=arguments.key, value=returnValue, time=arguments.$cache, category=arguments.category);
 	</cfscript>
 	<cfreturn returnValue>
@@ -335,7 +339,7 @@
 		var loc = {};
 		if (application.wheels.cachePartials && (isNumeric(arguments.$cache) || (IsBoolean(arguments.$cache) && arguments.$cache)))
 		{
-			loc.category = "partial";
+			loc.category = "partials";
 			loc.key = $hashedKey(arguments);
 			loc.lockName = loc.category & loc.key;
 			loc.conditionArgs = {};

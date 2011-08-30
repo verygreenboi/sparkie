@@ -1,41 +1,47 @@
-WHEELS VERSION 1.1.3 (UNRELEASED)
-
-View Enhancements
-=================
-* Allows for relative url linking to be turned off in autolink() - [James Gibson, Tony Petruzzi]
-
-Controller Enhancements
-=======================
-* Allow for default argument on sendmail for from, to and subject - #727 [Andy Bellenie, Tony Petruzzi]
+WHEELS VERSION 1.2 BETA 1 (r5386)
 
 Model Enhancements
 ==================
-* You can now have bracket markers for all validation arguments - #706 [Tony Petruzzi]
-* Columns marked as not null should allow for blank strings - [Tony Petruzzi]
-
-Bug Fixes
-=========
-* Fixed issue with $create supplying incorrect keys to $query - [Don Humphreys, Tony Petruzzi]
-* The original transaction mode would not be respected during during callbacks - [Andy Bellenie, Tony Petruzzi]
-* "none" transaction modes would never close - [Andy Bellenie, Tony Petruzzi]
-* Incorrect $cache argument - #671 [William Fisk, Tony Petruzzi]
-* Route formats prevented fullstops from being used in params - #666 [Tom King, Raul Riera, Tony Petruzzi]
-* Controller in params should be upper camel case - #703 [William Fisk, Tony Petruzzi]
-* Application scope would not initialize in sub - #721 [Adam Chapman, Tony Petruzzi]
-* ValidatesUniquenessOf doesn't read soft-deletes - #719 [Andy Bellenie, Tony Petruzzi]
-* PaginationLinks(): routes with page number marker variable would produce the wrong links - [Kenneth Barrett, Tony Petruzzi]
-
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-WHEELS VERSION 1.1.2 (01/29/2011)
+* Fix to make sure the unique identifier in each new model object during a request is unique - [James Gibson]
+* Allow for self joining tables in associations - #293 [James Gibson]
+* Added "joinKey" on belongsTo(), hasOne() and hasMany() which allows you to specify a column to join to on the opposite side of the relationship from the "foreignKey" - [James Gibson]
 
 View Enhancements
 =================
-* Select, SelectTag allow an array of structs to be passed to options - #680 [William Fisk, Tony Petruzzi]
+* Added a better way to escape all HTML entities - [James Gibson]
+* Ability to use custom types (HTML 5) on textField and textFieldTag form helpers - [Raul Riera]
+* Default to the humanized property name for labels on calculated or non-persistent properties instead of throwing an error - [Andy Bellenie]
+* Added escapeHTML argument on simpleFormat() - [Chris Peters]
+* Made it possible to set global defaults on autoLink(), excerpt(), highlight() and simpleFormat() - [Chris Peters]
+* Added support for array of structs for select() and selectTag() - #680 [William Fisk, Tony Petruzzi] 
 
 Controller Enhancements
 =======================
-* Changed "default" argument on includeContent() to "defaultValue" - #663 [Tony Petruzzi]
+* Speed improvement for finding routes when using a large amount of named routes - [James Gibson]
+* Wheels now compacts the output of the rendered content - [James Gibson]
+
+Other Enhancements
+==================
+* Added automatic caching in production mode of function results based on the arguments passed in - [Per Djurner]
+* Plugin functions can now be injected into base model adapter and model connection components - [Per Djurner]
+* Added support for Unobstructive Javascript - [Raul Riera]
+* Added proper HTTP status headers - #705 [cfconcepts, Andy Bellenie]
+
+Bug Fixes
+=========
+* Allow blank values to be passed through to validation - #638 [Per Djurner]
+* Allow for encoding autodetection within provides - #674 [Raul Riera]
+* Transactions would not close when used with the dependent argument of hasMany() - #739 [Andy Bellenie]
+* Soft deletes now work correctly with outer joins - #762 [Andy Bellenie]
+* Pagination with compound keys - #725 [Andy Bellenie, jfeasel, Tony Petruzzi]
+
+Miscellaneous
+=============
+* Removed the "cacheDatabaseSchema" setting, "cacheModelInitialization" should now be used instead - [Per Djurner]
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+WHEELS VERSION 1.1.2
 
 Model Enhancements
 ==================
@@ -45,9 +51,7 @@ Bug Fixes
 =========
 * Added the varchar_ignorecase type to the H2 adapter - #664 [Per Djurner]
 * Fix so that the full tablename is always retuned - #667 [Tony Petruzzi]
-* Pagaination with parameterize set to false for numeric keys - #656 [levi730, Tony Petruzzi]
 * Blank should be the selected value when includeBlank is set - #633 [Tony Petruzzi]
-* validatesLengthOf failed when both maximum and minimum were specified - [Tony Petruzzi]
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 

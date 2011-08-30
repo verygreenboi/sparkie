@@ -73,11 +73,13 @@
 </cffunction>
 
 <cffunction name="$secondSelectTag" returntype="string" access="public" output="false">
+	<cfargument name="secondStep" type="numeric" required="true">
 	<cfscript>
 		arguments.$loopFrom = 0;
 		arguments.$loopTo = 59;
 		arguments.$type = "second";
-		arguments.$step = 1;
+		arguments.$step = arguments.secondStep;
+		StructDelete(arguments, "secondStep");
 	</cfscript>
 	<cfreturn $yearMonthHourMinuteSecondSelectTag(argumentCollection=arguments)>
 </cffunction>
@@ -98,7 +100,7 @@
 		// in order to support 12-hour format, we have to enforce some rules
 		// if arguments.twelveHour is true, then order MUST contain ampm
 		// if the order contains ampm, then arguments.twelveHour MUST be true
-		if (arguments.twelveHour || ListFindNoCase(arguments.order, "ampm"))
+		if (ListFindNoCase(arguments.order, "hour") && arguments.twelveHour && !ListFindNoCase(arguments.order, "ampm"))
 		{
 			arguments.twelveHour = true;
 			if (!ListFindNoCase(arguments.order, "ampm"))
@@ -169,17 +171,24 @@
 	<cfargument name="$step" type="numeric" required="true">
 	<cfargument name="$optionNames" type="string" required="false" default="">
 	<cfargument name="twelveHour" type="boolean" required="false" default="false">
+	<cfargument name="$now" type="date" required="false" default="#now()#">
 	<cfscript>
 		var loc = {};
 		loc.optionContent = "";
 		// only set the default value if the value is blank and includeBlank is false
 		if (!Len(arguments.value) && (IsBoolean(arguments.includeBlank) && !arguments.includeBlank))
 			if (arguments.twelveHour && arguments.$type IS "hour")
-				arguments.value = TimeFormat(Now(), 'h');
+				arguments.value = TimeFormat(arguments.$now, 'h');
 			else
-				arguments.value = Evaluate("#arguments.$type#(Now())");
+				arguments.value = Evaluate("#arguments.$type#(arguments.$now)");
 		if (StructKeyExists(arguments, "order") && ListLen(arguments.order) > 1 && ListLen(arguments.label) > 1)
 			arguments.label = ListGetAt(arguments.label, ListFindNoCase(arguments.order, arguments.$type));
+
+		if (StructKeyExists(arguments, "order") && ListLen(arguments.order) > 1 && StructKeyExists(arguments, "labelClass") && ListLen(arguments.labelClass) > 1)
+		{
+			arguments.labelClass = ListGetAt(arguments.labelClass, ListFindNoCase(arguments.order, arguments.$type));
+		}
+		
 		if (!StructKeyExists(arguments, "id"))
 			arguments.id = arguments.$id & "-" & arguments.$type;
 		loc.before = $formBeforeElement(argumentCollection=arguments);
@@ -216,7 +225,7 @@
 				loc.content = loc.content & $yearMonthHourMinuteSecondSelectTagContent(argumentCollection=loc.args);
 			}
 		}
-		loc.returnValue = loc.before & $element(name="select", skip="objectName,property,label,labelPlacement,prepend,append,prependToLabel,appendToLabel,errorElement,errorClass,value,includeBlank,order,separator,startYear,endYear,monthDisplay,dateSeparator,dateOrder,timeSeparator,timeOrder,minuteStep,association,position,twelveHour", skipStartingWith="label", content=loc.content, attributes=arguments) & loc.after;
+		loc.returnValue = loc.before & $element(name="select", skip="objectName,property,label,labelPlacement,prepend,append,prependToLabel,appendToLabel,errorElement,errorClass,value,includeBlank,order,separator,startYear,endYear,monthDisplay,dateSeparator,dateOrder,timeSeparator,timeOrder,minuteStep,secondStep,association,position,twelveHour", skipStartingWith="label", content=loc.content, attributes=arguments) & loc.after;
 	</cfscript>
 	<cfreturn loc.returnValue>
 </cffunction>
@@ -242,12 +251,13 @@
 	<cfargument name="name" type="string" required="true">
 	<cfargument name="value" type="string" required="true">
 	<cfargument name="$id" type="string" required="true">
+	<cfargument name="$now" type="date" required="false" default="#now()#">
 	<cfscript>
 		var loc = {};
 		loc.options = "AM,PM";
 		loc.optionContent = "";
 		if (!Len(arguments.value))
-			arguments.value = TimeFormat(Now(), 'tt');
+			arguments.value = TimeFormat(arguments.$now, 'tt');
 		if (!StructKeyExists(arguments, "id"))
 			arguments.id = arguments.$id & "-ampm";
 		loc.content = "";
@@ -265,7 +275,7 @@
 			loc.content = loc.content & $element(name="option", content=loc.option, attributes=loc.args);
 		}
 
-		loc.returnValue = $element(name="select", skip="objectName,property,label,labelPlacement,prepend,append,prependToLabel,appendToLabel,errorElement,errorClass,value,includeBlank,order,separator,startYear,endYear,monthDisplay,dateSeparator,dateOrder,timeSeparator,timeOrder,minuteStep,association,position,twelveHour", skipStartingWith="label", content=loc.content, attributes=arguments);
+		loc.returnValue = $element(name="select", skip="objectName,property,label,labelPlacement,prepend,append,prependToLabel,appendToLabel,errorElement,errorClass,value,includeBlank,order,separator,startYear,endYear,monthDisplay,dateSeparator,dateOrder,timeSeparator,timeOrder,minuteStep,secondStep,association,position,twelveHour", skipStartingWith="label", content=loc.content, attributes=arguments);
 	</cfscript>
 	<cfreturn loc.returnValue>
 </cffunction>

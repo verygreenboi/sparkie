@@ -39,7 +39,7 @@
 		request.cgi = $cgiScope();
 
 		// set up containers for routes, caches, settings etc
-		application.wheels.version = "1.1.3";
+		application.wheels.version = "1.2 Beta 1";
 		application.wheels.controllers = {};
 		application.wheels.models = {};
 		application.wheels.existingHelperFiles = "";
@@ -51,15 +51,7 @@
 		application.wheels.routes = [];
 		application.wheels.namedRoutePositions = {};
 		application.wheels.mixins = {};
-		application.wheels.cache = {};
-		application.wheels.cache.sql = {};
-		application.wheels.cache.image = {};
-		application.wheels.cache.main = {};
-		application.wheels.cache.action = {};
-		application.wheels.cache.page = {};
-		application.wheels.cache.partial = {};
-		application.wheels.cache.query = {};
-		application.wheels.cacheLastCulledAt = Now();
+		application.wheels.vendor = {};
 
 		// set up paths to various folders in the framework
 		application.wheels.webPath = Replace(request.cgi.script_name, Reverse(spanExcluding(Reverse(request.cgi.script_name), "/")), "");
@@ -108,7 +100,7 @@
 				application.wheels.protectedControllerMethods = ListAppend(application.wheels.protectedControllerMethods, loc.method);
 		}
 
-		// reload the plugins each time we reload the application
+		// load plugins
 		$loadPlugins();
 		
 		// allow developers to inject plugins into the application variables scope
@@ -121,6 +113,12 @@
 		// create the dispatcher that will handle all incoming requests
 		application.wheels.dispatch = $createObjectFromRoot(path="wheels", fileName="Dispatch", method="$init");
 
+		// create the cache objects for each category
+		application.wheels.caches = {};
+		
+		for (loc.item in application.wheels.cacheSettings)
+			application.wheels.caches[loc.item] = $createObjectFromRoot(path="wheels", fileName="Cache", method="init", argumentCollection=application.wheels.cacheSettings[loc.item]);
+		
 		// run the developer's on application start code
 		$include(template="#application.wheels.eventPath#/onapplicationstart.cfm");
 	</cfscript>

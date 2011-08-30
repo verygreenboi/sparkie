@@ -27,6 +27,7 @@
 	<cfargument name="prependToLabel" type="string" required="false" hint="See documentation for @textField.">
 	<cfargument name="appendToLabel" type="string" required="false" hint="See documentation for @textField.">
 	<cfargument name="combine" type="boolean" required="false" hint="See documentation for @dateSelect.">
+	<cfargument name="$now" type="date" required="false" default="#now()#">
 	<cfscript>
 		$args(name="dateSelectTags", args=arguments);
 		arguments.property = arguments.name;
@@ -58,6 +59,7 @@
 	<cfargument name="order" type="string" required="false" hint="See documentation for @timeSelect.">
 	<cfargument name="separator" type="string" required="false" hint="See documentation for @timeSelect.">
 	<cfargument name="minuteStep" type="numeric" required="false" hint="See documentation for @timeSelect.">
+	<cfargument name="secondStep" type="numeric" required="false" hint="See documentation for @timeSelect.">
 	<cfargument name="includeBlank" type="any" required="false" hint="See documentation for @select.">
 	<cfargument name="label" type="string" required="false" hint="See documentation for @dateSelect.">
 	<cfargument name="labelPlacement" type="string" required="false" hint="See documentation for @textField.">
@@ -103,6 +105,7 @@
 	<cfargument name="timeOrder" type="string" required="false" hint="See documentation for @dateTimeSelect.">
 	<cfargument name="timeSeparator" type="string" required="false" hint="See documentation for @dateTimeSelect.">
 	<cfargument name="minuteStep" type="numeric" required="false" hint="See documentation for @timeSelect.">
+	<cfargument name="secondStep" type="numeric" required="false" hint="See documentation for @timeSelect.">
 	<cfargument name="separator" type="string" required="false" hint="See documentation for @dateTimeSelect.">
 	<cfargument name="includeBlank" type="any" required="false" hint="See documentation for @select.">
 	<cfargument name="label" type="string" required="false" hint="See documentation for @dateSelect.">
@@ -175,10 +178,13 @@
 	<cfargument name="append" type="string" required="false" hint="See documentation for @textField.">
 	<cfargument name="prependToLabel" type="string" required="false" hint="See documentation for @textField.">
 	<cfargument name="appendToLabel" type="string" required="false" hint="See documentation for @textField.">
+	<cfargument name="$now" type="date" required="false" default="#now()#">
 	<cfscript>
 		$args(name="yearSelectTag", args=arguments);
 		if (IsNumeric(arguments.selected))
-			arguments.selected = createDate(arguments.selected, Month(Now()), Day(Now()));
+		{
+			arguments.selected = $dateForSelectTags("year", arguments.selected, arguments.$now);
+		}
 		arguments.order = "year";
 	</cfscript>
 	<cfreturn dateSelectTags(argumentCollection=arguments)>
@@ -203,10 +209,14 @@
 	<cfargument name="append" type="string" required="false" hint="See documentation for @textField.">
 	<cfargument name="prependToLabel" type="string" required="false" hint="See documentation for @textField.">
 	<cfargument name="appendToLabel" type="string" required="false" hint="See documentation for @textField.">
+	<cfargument name="$now" type="date" required="false" default="#now()#">
 	<cfscript>
+		var loc = {};
 		$args(name="monthSelectTag", args=arguments);
-		if (IsNumeric(arguments.selected) and arguments.selected gt 0 and arguments.selected lte 12)
-			arguments.selected = createDate(Year(Now()), arguments.selected, Day(Now()));
+		if (IsNumeric(arguments.selected) and IsValid("range", arguments.selected, 0, 12))
+		{
+			arguments.selected = $dateForSelectTags("month", arguments.selected, arguments.$now);
+		}
 		arguments.order = "month";
 	</cfscript>
 	<cfreturn dateSelectTags(argumentCollection=arguments)>
@@ -230,10 +240,13 @@
 	<cfargument name="append" type="string" required="false" hint="See documentation for @textField.">
 	<cfargument name="prependToLabel" type="string" required="false" hint="See documentation for @textField.">
 	<cfargument name="appendToLabel" type="string" required="false" hint="See documentation for @textField.">
+	<cfargument name="$now" type="date" required="false" default="#now()#">
 	<cfscript>
 		$args(name="daySelectTag", args=arguments);
-		if (IsNumeric(arguments.selected) and arguments.selected gt 0 and arguments.selected lte 31)
-			arguments.selected = createDate(Year(Now()), Month(Now()), arguments.selected);
+		if (IsNumeric(arguments.selected) and IsValid("range", arguments.selected, 0, 31))
+		{
+			arguments.selected = $dateForSelectTags("day", arguments.selected, arguments.$now);
+		}
 		arguments.order = "day";
 	</cfscript>
 	<cfreturn dateSelectTags(argumentCollection=arguments)>
@@ -263,10 +276,11 @@
 	<cfargument name="prependToLabel" type="string" required="false" hint="See documentation for @textField.">
 	<cfargument name="appendToLabel" type="string" required="false" hint="See documentation for @textField.">
 	<cfargument name="twelveHour" type="boolean" required="false" default="false" hint="See documentation for @timeSelect.">
+	<cfargument name="$now" type="date" required="false" default="#now()#">
 	<cfscript>
 		$args(name="hourSelectTag", args=arguments);
 		if (IsNumeric(arguments.selected) and arguments.selected gte 0 and arguments.selected lt 60)
-			arguments.selected = createTime(arguments.selected, Minute(Now()), Second(Now()));
+			arguments.selected = createTime(arguments.selected, Minute(arguments.$now), Second(arguments.$now));
 		arguments.order = "hour";
 	</cfscript>
 	<cfreturn timeSelectTags(argumentCollection=arguments)>
@@ -296,10 +310,13 @@
 	<cfargument name="append" type="string" required="false" hint="See documentation for @textField.">
 	<cfargument name="prependToLabel" type="string" required="false" hint="See documentation for @textField.">
 	<cfargument name="appendToLabel" type="string" required="false" hint="See documentation for @textField.">
+	<cfargument name="$now" type="date" required="false" default="#now()#">
 	<cfscript>
 		$args(name="minuteSelectTag", args=arguments);
 		if (IsNumeric(arguments.selected) and arguments.selected gte 0 and arguments.selected lt 60)
-			arguments.selected = createTime(Hour(Now()), arguments.selected, Second(Now()));
+		{
+			arguments.selected = createTime(Hour(arguments.$now), arguments.selected, Second(arguments.$now));
+		}
 		arguments.order = "minute";
 	</cfscript>
 	<cfreturn timeSelectTags(argumentCollection=arguments)>
@@ -312,10 +329,16 @@
 		<cfoutput>
 		    ##secondSelectTag(name="secondsToLaunch", selected=params.secondsToLaunch)##
 		</cfoutput>
+		
+		<!--- Only show 15-second intervals --->
+		<cfoutput>
+			##secondSelectTag(name="secondsToLaunch", value=params.secondsToLaunch, secondStep=15)##
+		</cfoutput>
 	'
 	categories="view-helper,forms-plain" chapters="form-helpers-and-showing-errors" functions="URLFor,startFormTag,endFormTag,submitTag,textFieldTag,radioButtonTag,checkBoxTag,passwordFieldTag,hiddenFieldTag,textAreaTag,fileFieldTag,selectTag,dateTimeSelectTags,dateSelectTags,timeSelectTags">
 	<cfargument name="name" type="string" required="true" hint="See documentation for @textFieldTag.">
 	<cfargument name="selected" type="string" required="false" default="" hint="The second that should be selected initially.">
+	<cfargument name="secondStep" type="numeric" required="false" hint="See documentation for @timeSelect.">
 	<cfargument name="includeBlank" type="any" required="false" hint="See documentation for @select.">
 	<cfargument name="label" type="string" required="false" hint="See documentation for @textField.">
 	<cfargument name="labelPlacement" type="string" required="false" hint="See documentation for @textField.">
@@ -323,11 +346,67 @@
 	<cfargument name="append" type="string" required="false" hint="See documentation for @textField.">
 	<cfargument name="prependToLabel" type="string" required="false" hint="See documentation for @textField.">
 	<cfargument name="appendToLabel" type="string" required="false" hint="See documentation for @textField.">
+	<cfargument name="$now" type="date" required="false" default="#now()#">
 	<cfscript>
 		$args(name="secondSelectTag", args=arguments);
 		if (IsNumeric(arguments.selected) and arguments.selected gte 0 and arguments.selected lt 60)
-			arguments.selected = createTime(Hour(Now()), Minute(Now()), arguments.selected);
+			arguments.selected = createTime(Hour(arguments.$now), Minute(arguments.$now), arguments.selected);
 		arguments.order = "second";
 	</cfscript>
 	<cfreturn timeSelectTags(argumentCollection=arguments)>
+</cffunction>
+
+<cffunction name="$dateForSelectTags" returntype="date" access="public" output="false">
+	<cfargument name="part" type="string" required="true">
+	<cfargument name="value" type="numeric" required="true">
+	<cfargument name="$now" type="date" required="true">
+	<cfscript>
+	var loc = {};
+	loc._year = year(arguments.$now);
+	loc._month = month(arguments.$now);
+	loc._day = day(arguments.$now);
+	loc.ret = arguments.$now;
+	
+	switch(arguments.part)
+	{
+		case "year":
+		{
+			loc._year = arguments.value;
+			break;
+		}
+		case "month":
+		{
+			loc._month = arguments.value;
+			break;
+		}
+		case "day":
+		{
+			loc._day = arguments.value;
+			break;
+		}
+	}
+	
+	// handle febuary
+	if (loc._month eq 2 && ((!IsLeapYear(loc._year) && loc._day gt 29) || (IsLeapYear(loc._year) && loc._day gt 28)))
+	{
+		if (IsLeapYear(loc._year))
+		{
+			loc._day = 29;
+		}
+		else
+		{
+			loc._day = 28;
+		}
+	}
+	
+	try
+	{
+		loc.ret = createDate(loc._year, loc._month, loc._day);
+	}
+	catch (Any e)
+	{
+		loc.ret = arguments.$now;
+	}
+	</cfscript>
+	<cfreturn loc.ret>
 </cffunction>

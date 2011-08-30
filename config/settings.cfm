@@ -1,10 +1,10 @@
 <!---
 	If you leave these settings commented out, Wheels will set the data source name to the same name as the folder the application resides in.
+	<cfset set(dataSourceName="")>
 	<cfset set(dataSourceUserName="")>
 	<cfset set(dataSourcePassword="")> 
 --->
-<!--- datasource --->
-<cfset set(dataSourceName="hivdata")>
+
 <!---
 	If you leave this setting commented out, Wheels will try to determine the URL rewrite capabilities automatically.
 	The URLRewriting setting can bet set to "On", "Partial" or "Off".
