@@ -1,9 +1,13 @@
 <!---
 	If you leave these settings commented out, Wheels will set the data source name to the same name as the folder the application resides in.
-	<cfset set(dataSourceName="")>
+	<cfset set(dataSourceName="sparkie")>
 	<cfset set(dataSourceUserName="")>
 	<cfset set(dataSourcePassword="")> 
 --->
+
+<!--- TODO: See how to make this value added during initial setup --->
+
+<cfset set(dataSourceName="sparkie")>
 
 <!---
 	If you leave this setting commented out, Wheels will try to determine the URL rewrite capabilities automatically.
@@ -12,3 +16,5 @@
 	To run with rewriting "On", you need to apply the necessary rewrite rules on the web server first.
 	<cfset set(URLRewriting="Partial")>
 --->
+
+<cfset set(URLRewriting="on")>
