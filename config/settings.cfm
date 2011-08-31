@@ -7,7 +7,6 @@
 
 <!--- TODO: See how to make this value added during initial setup --->
 
-<cfset set(dataSourceName="sparkie")>
 
 <!---
 	If you leave this setting commented out, Wheels will try to determine the URL rewrite capabilities automatically.
@@ -18,3 +17,8 @@
 --->
 
 <cfset set(URLRewriting="on")>
+
+<!--- Form Helpers --->
+
+<cfset set(functionName="textfieldtag", labelPlacement="before", prependToLabel="<div class='clearfix'>", append="</div>")>
+<cfset set(functionName="Passwordfieldtag", labelPlacement="before", prependToLabel="<div class='clearfix'>", append="</div>")>
