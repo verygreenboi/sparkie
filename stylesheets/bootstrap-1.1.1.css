@@ -1988,3 +1988,33 @@ button.btn::-moz-focus-inner, input[type=submit].btn::-moz-focus-inner {
 .popover .content p, .popover .content ul, .popover .content ol {
   margin-bottom: 0;
 }
+
+
+
+/*! Sparkie specific style */
+
+#adminMenu li{
+	list-style: none;
+}
+
+#adminMenu a{
+	width: 169px;
+	padding: 5px;
+}
+
+#adminMenu .adminmenuIcon{
+	display:inline;
+	padding-top: 5px;
+	width: 16px;
+	min-height: 15px;
+}
+
+#adminMenu .adminmenuIcon a{
+	display: inline;
+}
+
+#adminMenu .subMenu a{
+	padding: 5px 0;
+	float: none;
+	width: 100%;
+}

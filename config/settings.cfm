@@ -5,9 +5,6 @@
 	<cfset set(dataSourcePassword="")> 
 --->
 
-<!--- TODO: See how to make this value added during initial setup --->
-
-
 <!---
 	If you leave this setting commented out, Wheels will try to determine the URL rewrite capabilities automatically.
 	The URLRewriting setting can bet set to "On", "Partial" or "Off".
@@ -22,3 +19,5 @@
 
 <cfset set(functionName="textfieldtag", labelPlacement="before", prependToLabel="<div class='clearfix'>", append="</div>")>
 <cfset set(functionName="Passwordfieldtag", labelPlacement="before", prependToLabel="<div class='clearfix'>", append="</div>")>
+
+<cfset set(dataSourceName="sparkie")>

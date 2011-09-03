@@ -36,4 +36,7 @@
 		
 	</cffunction>
 
+	<cffunction name="dashboard">
+		<cfset renderText("whoopie!!!")>
+	</cffunction>
 </cfcomponent>
