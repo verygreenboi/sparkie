@@ -1,6 +1,7 @@
 <cfcomponent extends="Controller" output="false">
 	
 	<cffunction name="init">
+		<cfset filters(through="getInstallDir")>
 		<cfset filters(through="chkInstall")>		
 	</cffunction>
 
@@ -12,7 +13,6 @@
 	</cffunction>
 	
 	<cffunction name="chkInstall">
-		<cfset getInstallDir()>
 		
 		<cfif fileExists(setupcheck)>
 		<cfelse>

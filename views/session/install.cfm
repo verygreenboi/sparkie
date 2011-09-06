@@ -13,8 +13,20 @@
 				#textFieldTag(label="Blog Title", name="title", class="xlarge", appendToLabel="<div class='input'>", append="</div></div>")#
 				#textFieldTag(label="Blog Tagline", name="tagline", class="xlarge", appendToLabel="<div class='input'>", append="</div></div>")#
 				#textFieldTag(label="Username", name="user", class="xlarge", appendToLabel="<div class='input'>", append="</div></div>")#
-				#passwordFieldTag(label="Password", name="password", class="xlarge", appendToLabel="<div class='input'>", append="</div></div>")#
-				#passwordFieldTag(label="Confirm Password", name="passwordConfirmation", class="xlarge", appendToLabel="<div class='input'>", append="</div></div>")#
+				<cfif flashKeyExists("matchError")>
+					#passwordFieldTag(label="Password", name="password", class="xlarge error", appendToLabel="<div class='input'>", append="</div></div>")#
+					#passwordFieldTag(label="Confirm Password", name="passwordConfirmation", class="xlarge error",prependToLabel="<div class='clearfix error'>", appendToLabel="<div class='input'>", append="<span class='help-inline'>This does not match the password entered.</span></div></div>")#
+				<cfelseif flashKeyExists("blankError")>
+				
+					#passwordFieldTag(label="Password", name="password", class="xlarge error", prependToLabel="<div class='clearfix error'>", appendToLabel="<div class='input'>", append="<span class='help-inline'>Password cannot be empty!</span></div></div>")#
+					#passwordFieldTag(label="Confirm Password", name="passwordConfirmation", class="xlarge error", appendToLabel="<div class='input'>", append="</div></div>")#
+					
+				<cfelse>
+				
+					#passwordFieldTag(label="Password", name="password", class="xlarge", appendToLabel="<div class='input'>", append="</div></div>")#
+					#passwordFieldTag(label="Confirm Password", name="passwordConfirmation", class="xlarge", appendToLabel="<div class='input'>", append="</div></div>")#
+				
+				</cfif>
 				#textFieldTag(label="Email", name="email", class="xlarge", appendToLabel="<div class='input'>", append="</div>")#
 				
 				<div class="actions">

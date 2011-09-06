@@ -1997,20 +1997,40 @@ button.btn::-moz-focus-inner, input[type=submit].btn::-moz-focus-inner {
 	list-style: none;
 }
 
+.menuHeader{
+	padding: 5px;
+	overflow: hidden;
+	line-height: 33px;
+}
+
 #adminMenu a{
 	width: 169px;
 	padding: 5px;
 }
 
 #adminMenu .adminmenuIcon{
-	display:inline;
 	padding-top: 5px;
-	width: 16px;
-	min-height: 15px;
+	width: 28px;
+	height: 28px;
+	float: left;
 }
 
 #adminMenu .adminmenuIcon a{
 	display: inline;
+}
+
+#adminMenu .subMenu ul{
+	margin: 0;
+	padding: 0;
+}
+
+#adminMenu li.seperator{
+	border-style: solid;
+	border-width: 1px 0px;
+	cursor: inherit;
+	height: 3px;
+	margin: 0px;
+	padding: 0px;
 }
 
 #adminMenu .subMenu a{
@@ -2018,3 +2038,15 @@ button.btn::-moz-focus-inner, input[type=submit].btn::-moz-focus-inner {
 	float: none;
 	width: 100%;
 }
+
+
+#menu-home .adminmenuIcon{
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -60px -1px;
+	
+}
+
+#post-menu .adminmenuIcon{
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -271px -1px;
+	
+}
+

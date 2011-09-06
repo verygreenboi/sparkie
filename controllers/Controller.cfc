@@ -4,10 +4,6 @@
 	Do not delete this file.
 --->
 <cfcomponent extends="Wheels">
-	<cffunction name="init">
-	
-		<cfset filters(through="getInstallDir")>
-	</cffunction>
 	
 	<cffunction name="getInstallDir">
 		<cfset thisPath = ExpandPath("*.*")> 
