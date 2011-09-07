@@ -5,6 +5,12 @@
 --->
 <cfcomponent extends="Wheels">
 	
+	<cffunction name="init">
+		
+		<cfset filters(through="checkLogin", except="login,register,signin,install,createInstall,index")>
+		
+	</cffunction>
+	
 	<cffunction name="getInstallDir">
 		<cfset thisPath = ExpandPath("*.*")> 
 		<cfset thisDirectory = GetDirectoryFromPath(thisPath)> 
@@ -21,4 +27,15 @@
 		<cfset setupCheck = #setupCheck#&#installFile#>
 	</cffunction>
 	
+	<cffunction name="checkLogin">
+		
+		<cfif NOT structKeyExists(session, "user")>
+			
+			<cfset session.redirection = [#params.controller#, #params.action#]>
+			
+			<cfset redirectTo(route="login")>
+			
+		</cfif>
+		
+	</cffunction>
 </cfcomponent>

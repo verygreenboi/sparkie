@@ -18,4 +18,7 @@
 <!--- Form Helpers --->
 
 <cfset set(functionName="textfieldtag", labelPlacement="before", prependToLabel="<div class='clearfix'>", append="</div>")>
-<cfset set(functionName="Passwordfieldtag", labelPlacement="before", prependToLabel="<div class='clearfix'>", append="</div>")><cfset set(dataSourceName="sparkie")>
+<cfset set(functionName="textfield", labelPlacement="before", prependToLabel="<div class='clearfix'>", append="</div>")>
+<cfset set(functionName="Passwordfieldtag", labelPlacement="before", prependToLabel="<div class='clearfix'>", append="</div>")>
+<cfset set(functionName="Passwordfield", labelPlacement="before", prependToLabel="<div class='clearfix'>", append="</div>")>
+<cfset set(dataSourceName="sparkie")>

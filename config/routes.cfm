@@ -3,6 +3,10 @@
 	The default route is the one that will be called on your application's "home" page.
 --->
 
+<!--- Login --->
+
+<cfset addRoute(name="login", pattern="/admin/login", controller="session", action="login")>
+
 <!--- Installation --->
 
 <cfset addRoute(name="install", pattern="/admin/install", controller="session", action="install")>

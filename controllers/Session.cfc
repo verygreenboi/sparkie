@@ -3,6 +3,8 @@
 	<cffunction name="init">
 		<cfset filters(through="getInstallDir")>	
 	</cffunction>
+	
+	<!--- Installation --->
 
 	<cffunction name="Install">
 
@@ -219,4 +221,51 @@
 		</cfquery> --->
 	
 	</cffunction>
+
+	<!--- Authentication and user management --->
+	
+	<cffunction name="login">
+			
+		<cfset user = model("user").new()>
+			
+	</cffunction>
+	
+	<cffunction name="register">
+		
+		
+		
+	</cffunction>
+	
+	<cffunction name="signin">
+		
+		<cfset password = #hash(params.user.userPass, "MD5")#>
+		
+		<cfset user = model("user").findOne(where="userLogin='#params.user.userLogin#' AND userPass='#password#'")>
+		
+		<cfif isObject(user)>
+		
+			<cfset session.user.id = user.id>
+			
+			<cfset redirectTo(controller="#session.redirection[1]#", action="#session.redirection[2]#")>
+			
+		<cfelse>
+		
+			<cfset user = model("user").new()>
+			
+			<cfset flashInsert(error="Your Username and password combination is incorrect.")>
+			
+			<cfset renderPage(action="login")>
+		
+		</cfif>
+		
+	</cffunction>
+	
+	<cffunction name="logout">
+		
+		<cfset structDelete(session, "user")>
+		
+		<cfset redirectTo(route="home")>
+	
+	</cffunction>
+
 </cfcomponent>

@@ -1,7 +1,5 @@
 <!--- Place code here that should be executed on the "onRequestStart" event. --->
 
-<!--- <cfdump var="#SCRIPT_NAME#/?reload=true" abort="true"> --->
-
 <cfset thisPath = ExpandPath("*.*")> 
 <cfset thisDirectory = GetDirectoryFromPath(thisPath)> 
 <cfset setupCheck = #thisDirectory#&"miscellaneous">
@@ -41,4 +39,14 @@
 	
 <cfelse>
 
+</cfif>
+
+<!--- use the session.installed to verify install progress --->
+
+<cfparam name="session.installed" default="no">
+
+<cfif session.installed eq "yes">
+	<cfset session.installed = "done">	
+	<cfset redirectTo(route="dash")>
+	
 </cfif>
