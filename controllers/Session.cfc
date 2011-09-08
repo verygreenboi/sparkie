@@ -47,9 +47,7 @@
 		
 		<cfset createUserTable()>
 		
-		<!--- Append DSN to settings.cfm --->
-		
-		<cfset initAppendAndCreate()>
+		<cfset createUserMetaTable()>
 		
 		<cfquery name="insertIntoOption" datasource="#dsn#">
 			
@@ -67,6 +65,21 @@
 			
 		
 		</cfquery>
+		
+		<cfquery name="getUser" datasource="#dsn#">
+			SELECT	id
+			FROM users
+			WHERE userLogin = "#params.user#"
+		</cfquery>
+		
+		<cfquery name="insertIntoUserMeta" datasource="#dsn#">
+			INSERT INTO `usermeta`(`userID`, `role`) VALUES
+							   (#getUser.id#, 'admin')
+		</cfquery>
+		
+		<!--- Append DSN to settings.cfm --->
+		
+		<cfset initAppendAndCreate()>		
 		
 		<!--- TODO: Remember to restart the app to make the dsn change take effect --->
 		
@@ -221,7 +234,26 @@
 		</cfquery> --->
 	
 	</cffunction>
-
+	
+	<cffunction name="createUserMetaTable">
+	
+		<cfquery name="createUserMetaTable" datasource="#dsn#">
+			CREATE TABLE IF NOT EXISTS `usermeta` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`userID` bigint(20) unsigned NOT NULL DEFAULT '0',
+				`firstname` varchar(255) DEFAULT NULL,
+				`lastname` varchar(255) DEFAULT NULL,
+				`role` varchar(45) DEFAULT NULL,
+				`createdAt` datetime NULL,
+				`updatedAt` datetime NULL,
+				`deletedAt` datetime NULL,
+				PRIMARY KEY (`ID`)
+			) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+		
+		</cfquery>
+	
+	</cffunction>
+	
 	<!--- Authentication and user management --->
 	
 	<cffunction name="login">

@@ -12,14 +12,27 @@
 <cfset addRoute(name="install", pattern="/admin/install", controller="session", action="install")>
 <cfset addRoute(name="createInstall", pattern="/admin/createInstall", controller="session", action="createInstall")>
 
-<!--- Dashboard routes --->
+<!--- ##Dashboard routes --->
+
+<!--- Post routes --->
 
 <cfset addRoute(name="edit-post", pattern="admin/edit-post", controller="dash", action="editPost")>
 <cfset addRoute(name="post", pattern="admin/post", controller="dash", action="Post")>
 <cfset addRoute(name="list-post", pattern="admin/list-post", controller="dash",action="listPost")>
-<cfset addRoute(name="category", pattern="admin/cat", controller="dash",action="category")>
-<cfset addRoute(name="post-tags", pattern="admin/post-tags", controller="dash",action="postTags")>
-<cfset addRoute(name="comments", pattern="admin/comments", controller="dash", action="comments")>
+
+<!--- Category routes --->
+<cfset addRoute(name="category", pattern="admin/cat", controller="categories",action="category")>
+
+<!--- Post tags Routes --->
+
+<cfset addRoute(name="post-tags", pattern="admin/post-tags", controller="tags",action="postTags")>
+
+<!--- Comments routes --->
+
+<cfset addRoute(name="comments", pattern="admin/listComments", controller="comments", action="comments")>
+
+<!--- Dash index --->
+
 <cfset addRoute(name="dash", pattern="/admin/dash", controller="dash", action="dashboard")>
 
 <!--- Home Route --->

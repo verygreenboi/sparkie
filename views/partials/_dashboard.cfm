@@ -46,6 +46,26 @@
 				</div>
 			</li>
 			
+			<li id="category-menu">
+				<div class="menuHeader">
+					<div class="adminmenuIcon">
+					</div>
+					
+					#linkTo(route="category", text="Category")#
+					
+				</div>
+			</li>
+			
+			<li id="Tags-menu">
+				<div class="menuHeader">
+					<div class="adminmenuIcon">
+					</div>
+					
+					#linkTo(route="post-tags", text="Post Tags")#
+					
+				</div>
+			</li>
+			
 		</ul>
 	</aside>
 

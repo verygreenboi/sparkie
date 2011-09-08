@@ -7,4 +7,8 @@
 		
 	</cffunction>
 	
+	<cffunction name="checkRole">
+	
+	</cffunction>
+	
 </cfcomponent>
