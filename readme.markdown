@@ -10,3 +10,6 @@ The usuals, Jquery and other js frameworks included.
 
 The installation process requires as little information as possible from the user bu it is vital that they are all provided.
 
+## Theme
+
+Sparkie is fully themeable. Themes are specially structured files that determine how the blog will look.
