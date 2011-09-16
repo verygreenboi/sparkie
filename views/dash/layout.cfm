@@ -14,6 +14,7 @@
 
     <!-- Le styles -->
 	#stylesheetLinkTag("bootstrap-1.1.1")#
+	#stylesheetLinkTag("admin")#
 
     <!-- Le fav and touch icons -->
     <link rel="shortcut icon" href="images/favicon.ico">
@@ -34,6 +35,7 @@
 			</div>
 		</section>
 		
+		<footer></footer>		
 
 	</div>
 </body>

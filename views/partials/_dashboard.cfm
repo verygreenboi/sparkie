@@ -1,71 +1,49 @@
 <cfoutput>
-
+	
 	<aside class="sidebar">
+		
 		<ul id="adminMenu">
-			<li id="menu-home">
-				<div class="menuHeader">
-					<div class="adminmenuIcon">
-						#linkTo(route="dash", text=" ")#
-					</div>
-					
-					#linkTo(route="dash", text="Dashboard")#
-				</div>
-				<div class="subMenu">
-					<ul>
-						<li>#linkTo(route="dash", text="Home")#</li>
-					</ul>
-				</div>
-			</li>
-			
-			<li class="seperator">
-			
-			<li id="post-menu">
-				<div class="menuHeader">	
-				<div class="adminmenuIcon">
-				</div>
+		
+			<cfif structKeyExists(session.user, "role")>
 				
-				#linkTo(route="edit-post", text="Posts")#
-				</div>
-				<div class="subMenu">
-					<ul>
-						<li>#linkTo(route="edit-post", text="Add New")#</li>
-						<li>#linkTo(route="list-post", text="All Posts")#</li>
-						<li>#linkTo(route="category", text="Categories")#</li>
-						<li>#linkTo(route="post-tags", text="Post Tags")#</li>
-					</ul>
-				</div>
-			</li>
-			
-			<li id="comment-menu">
-				<div class="menuHeader">
-					<div class="adminmenuIcon">
-					</div>
+				<cfswitch expression="#session.user.role#">
 					
-					#linkTo(route="comments", text="Comments")#
+					<cfcase value="admin">
+						
+						#includePartial("../partials/adminSide/adminHomeLink")#
+						<li class="seperator">
+						#includePartial("../partials/adminSide/adminPostLink")#
+						#includePartial("../partials/adminSide/adminCommentLink")#
+						#includePartial("../partials/adminSide/adminCatLink")#
+						#includePartial("../partials/adminSide/adminPagesLink")#
+						<li class="seperator">
+						#includePartial("../partials/adminSide/adminUserLink")#	
+						#includePartial("../partials/adminSide/adminSettingsLink")#						
+						
+					</cfcase>
 					
-				</div>
-			</li>
-			
-			<li id="category-menu">
-				<div class="menuHeader">
-					<div class="adminmenuIcon">
-					</div>
+					<cfcase value="author">
+						
+						#includePartial("../partials/adminSide/adminHomeLink")#
+						<li class="seperator">
+						#includePartial("../partials/adminSide/adminPostLink")#
+						#includePartial("../partials/adminSide/adminCommentLink")#
+						
+					</cfcase>
 					
-					#linkTo(route="category", text="Category")#
+					<cfcase value="contributor">
+						#includePartial("../partials/adminSide/adminHomeLink")#
+						<li class="seperator">
+						#includePartial("../partials/adminSide/adminPostLink")#
+					</cfcase>
 					
-				</div>
-			</li>
-			
-			<li id="Tags-menu">
-				<div class="menuHeader">
-					<div class="adminmenuIcon">
-					</div>
-					
-					#linkTo(route="post-tags", text="Post Tags")#
-					
-				</div>
-			</li>
-			
+					<cfdefaultcase>
+					</cfdefaultcase>
+				
+				</cfswitch>
+				
+			</cfif>
+		
 		</ul>
 	</aside>
 

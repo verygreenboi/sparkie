@@ -73,7 +73,7 @@
 		</cfquery>
 		
 		<cfquery name="insertIntoUserMeta" datasource="#dsn#">
-			INSERT INTO `usermeta`(`userID`, `role`) VALUES
+			INSERT INTO `usermetas`(`userID`, `role`) VALUES
 							   (#getUser.id#, 'admin')
 		</cfquery>
 		
@@ -213,32 +213,13 @@
 			  KEY `user_login_key` (`userLogin`)
 			) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 		
-		</cfquery>
-		
-		<!--- TODO: Move this to Dash.cfc --->
-		
-		<!--- <cfquery name="createUserMetaTable">
-			
-			CREATE TABLE IF NOT EXISTS `usermeta` (
-			  `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-			  `userID` varchar(60) NOT NULL DEFAULT '',
-			  `firstname` varchar(64) NOT NULL DEFAULT '',
-			  `lastname` varchar(50) NOT NULL DEFAULT '',
-			  `role` varchar(100) NOT NULL DEFAULT '',
-			  `createdAt` datetime NULL,
-			  `updatedAt` datetime NULL,
-			  `deletedAt` datetime NULL,
-			  PRIMARY KEY (`ID`))
-			) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
-			
-		</cfquery> --->
-	
+		</cfquery>	
 	</cffunction>
 	
 	<cffunction name="createUserMetaTable">
 	
 		<cfquery name="createUserMetaTable" datasource="#dsn#">
-			CREATE TABLE IF NOT EXISTS `usermeta` (
+			CREATE TABLE IF NOT EXISTS `usermetas` (
 				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 				`userID` bigint(20) unsigned NOT NULL DEFAULT '0',
 				`firstname` varchar(255) DEFAULT NULL,
@@ -272,11 +253,15 @@
 		
 		<cfset password = #hash(params.user.userPass, "MD5")#>
 		
-		<cfset user = model("user").findOne(where="userLogin='#params.user.userLogin#' AND userPass='#password#'")>
+		<cfset user = model("user").findOne(where="userLogin='#params.user.userLogin#' AND userPass='#password#'", include="usermeta")>
 		
 		<cfif isObject(user)>
-		
+			
 			<cfset session.user.id = user.id>
+			
+			
+			
+			<cfset session.user.role = user.usermetarole>
 			
 			<cfset redirectTo(controller="#session.redirection[1]#", action="#session.redirection[2]#")>
 			

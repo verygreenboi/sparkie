@@ -1,6 +1,6 @@
 <cfoutput>
 
-	<div class="span12">
+	<div id="login-box" class="span12">
 		
 		<div class="page-header">
 			<h2>Login</h2>

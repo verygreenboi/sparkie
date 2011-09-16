@@ -8,7 +8,7 @@
 	<cffunction name="init">
 		
 		<cfset filters(through="checkLogin", except="login,register,signin,install,createInstall,index")>
-		
+		<cfset filters(through="checkRole", except="login,register,signin,install,createInstall,index")>
 	</cffunction>
 	
 	<cffunction name="getInstallDir">
@@ -38,4 +38,15 @@
 		</cfif>
 		
 	</cffunction>
+	
+	<cffunction name="checkRole">
+		<cfif structKeyExists(session, "user")>
+			<cfif structKeyExists(session.user, "role") and #session.user.role# eq "user">
+				<cfset flashInsert(error="You are not authorised to view this page!")>
+				<cfset renderPage(action="forbidden")>
+			</cfif>
+		</cfif>
+	
+	</cffunction>
+	
 </cfcomponent>

@@ -1,0 +1,107 @@
+/*! Sparkie specific style */
+
+#adminMenu li{
+	list-style: none;
+}
+
+.menuHeader{
+	padding: 5px;
+	overflow: hidden;
+	line-height: 33px;
+}
+
+#adminMenu a{
+	width: 169px;
+	padding: 5px;
+}
+
+#adminMenu .adminmenuIcon{
+	padding-top: 5px;
+	width: 28px;
+	height: 28px;
+	float: left;
+}
+
+#adminMenu .adminmenuIcon a{
+	display: inline;
+}
+
+#adminMenu .subMenu ul{
+	margin: 0;
+	padding: 0;
+}
+
+#adminMenu li.seperator{
+	border-style: solid;
+	border-width: 1px 0px;
+	cursor: inherit;
+	height: 3px;
+	margin: 0px;
+	padding: 0px;
+}
+
+#adminMenu .subMenu a{
+	padding: 5px 0;
+	float: none;
+	width: 100%;
+}
+
+
+#menu-home .adminmenuIcon{
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -60px -1px;
+	
+}
+
+#post-menu .adminmenuIcon{
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -271px -1px;
+	
+}
+
+.widget{
+	background-color: #F7FCFE;
+	border-color: #D1E5EE;
+	-moz-box-shadow: inset 0 1px 0 #fff;
+	-webkit-box-shadow: inset 0 1px 0 #fff;
+	box-shadow: inset 0 1px 0 #fff;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-khtml-border-radius: 3px;
+	border-radius: 3px;
+	margin-bottom: 20px;
+	padding: 0;
+	border-width: 1px;
+	border-style: solid;
+	line-height: 1;
+	overflow: hidden;
+}
+
+.widget h3{
+	color: #174F69;
+	background-color: #F5FAFD;
+	background-image: -ms-linear-gradient(top,#f7fcfe,#eff8ff);
+	background-image: -moz-linear-gradient(top,#f7fcfe,#eff8ff);
+	background-image: -o-linear-gradient(top,#f7fcfe,#eff8ff);
+	background-image: -webkit-gradient(linear,left top,left bottom,from(#f7fcfe),to(#eff8ff));
+	background-image: -webkit-linear-gradient(top,#f7fcfe,#eff8ff);
+	background-image: linear-gradient(top,#f7fcfe,#eff8ff);
+	border-bottom-color: #D1E5EE;
+	text-shadow: white 0 1px 0;
+	-moz-box-shadow: 0 1px 0 #fff;
+	-webkit-box-shadow: 0 1px 0 #fff;
+	box-shadow: 0 1px 0 #fff;
+	font-size: 15px;
+	font-family: Georgia,"Times New Roman","Bitstream Charter",Times,serif;
+	font-weight: normal;
+	padding: 7px 10px;
+	margin: 0;
+	line-height: 1;
+}
+
+#right-now .inside {
+font-size: 12px;
+padding-top: 20px;
+}
+
+#right-now .makeBlock{
+	display: block;
+}

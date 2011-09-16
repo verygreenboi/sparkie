@@ -33,6 +33,8 @@
 			<cfoutput>#includeContent()#</cfoutput>
 		</div>
 	</div>
+	<footer>
+	</footer>
 </body>
 
 </html>

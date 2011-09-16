@@ -5,6 +5,7 @@
 		<!--- Association --->
 		
 		<cfset hasOne("usermeta")>
+		<cfset nestedProperties(association="usermeta")>
 		
 		<cfset validatesPresenceOf(property="username", message="Username is required")>
 		<cfset validatesPresenceOf(property="email" , message="Email is required.")>
